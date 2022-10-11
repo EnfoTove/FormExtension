@@ -1,0 +1,53 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
+  "port": 4321,
+  "https": true,
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://wcqvp.sharepoint.com/sites/sparvagen/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "5a6f77fa-bba5-4335-8b0c-e112ffff130c",
+        "PageType": 8,
+        "RootFolder": "/sites/sparvagen/Lists/Fastigheter",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "helloWorld_NewForm": {
+      "pageUrl": "https://wcqvp.sharepoint.com/sites/sparvagen/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "5a6f77fa-bba5-4335-8b0c-e112ffff130c",
+        "PageType": 8,
+        "RootFolder": "/sites/sparvagen/Lists/Fastigheter",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "helloWorld_EditForm": {
+      "pageUrl": "https://wcqvp.sharepoint.com/sites/sparvagen/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "5a6f77fa-bba5-4335-8b0c-e112ffff130c",
+        "PageType": 6,
+        "RootFolder": "/sites/sparvagen/Lists/Fastigheter",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "helloWorld_ViewForm": {
+      "pageUrl": "https://wcqvp.sharepoint.com/sites/sparvagen/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "5a6f77fa-bba5-4335-8b0c-e112ffff130c",
+        "PageType": 4,
+        "RootFolder": "/sites/sparvagen/Lists/Fastigheter",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    }
+  }
+}
