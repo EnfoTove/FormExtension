@@ -105,12 +105,27 @@ const NewForm: FC<INewFormProps> = (props) => {
       //  setOptionsLoaded(true)
     }
     
+    let counter = 0;
+    const setCounter=()=>{
+        if (counter>0 ){
+            console.log("options loaded already")
+        }
+        else{
+            createOptions()
+        }
+        counter= counter +1;
+    }
+
+    const handleInputAndResetCounter=(value:string)=>{
+        setBuildingTitle(value);
+        counter=0;
+    }
    
 
     return (
         <div className={styles.newForm}>
             <div className={styles.newFormInput}>
-                <TextField label="Ange Fastighetsnamn" value={buildingTitle} onChange={(e,v) => setBuildingTitle(v)} />
+                <TextField label="Ange Fastighetsnamn" value={buildingTitle} onChange={(e,v) => handleInputAndResetCounter(v)} />
             </div>
             <Stack tokens={stackTokens}>
                 <Dropdown
@@ -118,7 +133,7 @@ const NewForm: FC<INewFormProps> = (props) => {
                     label="Välj våning"
                     options={options}
                     styles={dropdownStyles}
-                    onClick={createOptions}
+                    onClick={setCounter}
                 />
             </Stack>
             <div className={styles.newFormInput}>
