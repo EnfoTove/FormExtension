@@ -5,4 +5,35 @@
     .newFormInput{
         margin:0.75rem 0;
     }
+
+    .fileUploadLabel{
+        display:flex;
+        flex-direction: column;
+    
+        .defaultFileUploader{
+          display:none;
+        }
+    
+        .attachmentIconSpan {
+          padding:0.5rem 0;
+          display:flex;
+          flex-direction: column;
+          align-items:flex-start;
+          font-weight: 600;
+
+          .attachmentIcon{
+            font-size: 1.5rem;
+            padding:0.5rem 0;
+        }
+    
+          .selectedFile{
+            font-weight: 400;
+          }
+        }
+    
+        .fileCustom:hover{
+          cursor: pointer;
+        }
+    
+    }
 }
