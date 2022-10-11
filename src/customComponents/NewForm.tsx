@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, FC, useEffect } from 'react';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
-import { DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
+import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { SPFI, SPFx } from '@pnp/sp';
 import "@pnp/sp/webs";
@@ -22,24 +22,35 @@ export interface INewFormProps {
     listGuid: Guid;
     onSave: () => void;
     onClose: () => void;
-   // getRelatedItems:()=>Promise<IRelatedItem[]>;
 }
- 
+//let floorItems;
 const NewForm: FC<INewFormProps> = (props) => {
     const [buildingTitle, setBuildingTitle] = useState<string>('');
-    //const [floorTitle, setFloorTitle] = useState<string>('');
-    const [floorArray, setfloorArray] = useState([]);
-
+    const [floorArray, setfloorArray] =  useState<IRelatedItem[]>([]);
     const [errorDescription, setErrorDescription] = useState<any>(undefined);
     const [msg, setMsg] = useState<any>(undefined);
+    const [optionsLoaded, setOptionsLoaded] = useState(false);
+    const options: IDropdownOption[]=[]
 
-    useEffect(() => {
-       console.log(buildingTitle)
+    function sleep(ms:number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+     useEffect(() => {
+        const handleInputChange = async () => {
+            await sleep(1000)
+            .then(populateFloorArray)
+            //.then(createOptions);
+        }
+        handleInputChange()
+        .catch(console.error);
       }, [buildingTitle]);
  
     const clearControls = () => {
         setBuildingTitle('');
+        setErrorDescription('');
     };
+
 
     const dropdownStyles: Partial<IDropdownStyles> = {
         dropdown: { width: 300 },
@@ -66,58 +77,48 @@ const NewForm: FC<INewFormProps> = (props) => {
       .select("Title, Byggnad")
       .filter(queryString)
       ();
-      console.log(relatedItems)
       return relatedItems as unknown as Promise<IRelatedItem[]>;
     } catch (error) {
-      console.log("ERROR")
       console.error(error);
     }
-}
-
-    async function setStateAndGetRelatedItems(event:any,value:string){
-        setBuildingTitle(value);
-        await populateFloorArray();
-        createOptions();
-    }
-    
+}    
     const stackTokens: IStackTokens = { childrenGap: 20 };
 
-    async function populateFloorArray() {
-        console.log("in pop floor array" + buildingTitle)
+    async function populateFloorArray(items:any) {
         try {
             await getRelatedItems().then(items=>{
                 setfloorArray(items)
-            })     
+            })
         } catch (error) {
             console.error(error);
         }
     }
 
-    const options: IDropdownOption[]=[]
-
-     function createOptions(){
-        console.log("Pushing options for " + buildingTitle)
+    
+    
+    const createOptions=()=>{
+        console.log("Options loading")
         floorArray.forEach(floor => {
-               const object= { key: floor.ID, text: floor.Title};
-               options.push(object);
-            });
-            console.log("Antal våningar: " + floorArray.length)
-            return options;
-
+            const object= { key: floor.Title, text: floor.Title};        
+                options.push(object);              
+            });               
+      //  setOptionsLoaded(true)
     }
+    
+   
 
     return (
         <div className={styles.newForm}>
             <div className={styles.newFormInput}>
-                <TextField label="Ange Fastighetsnamn" value={buildingTitle} onChange={(e,v) => setStateAndGetRelatedItems(e, v)} />
+                <TextField label="Ange Fastighetsnamn" value={buildingTitle} onChange={(e,v) => setBuildingTitle(v)} />
             </div>
-            <DefaultButton text="Hämta våningar" onClick={createOptions}/>
             <Stack tokens={stackTokens}>
                 <Dropdown
                     placeholder="Våning"
                     label="Välj våning"
                     options={options}
                     styles={dropdownStyles}
+                    onClick={createOptions}
                 />
             </Stack>
             <div className={styles.newFormInput}>
