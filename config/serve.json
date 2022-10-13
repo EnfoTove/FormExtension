@@ -31,7 +31,7 @@
         "componentId": "5a6f77fa-bba5-4335-8b0c-e112ffff130c",
         "PageType": 6,
         "RootFolder": "/sites/sparvagen/Lists/Fastigheter",
-        "ID": 1,
+        "ID": 104,
         "properties": {
           "sampleText": "Value"
         }
@@ -43,7 +43,7 @@
         "componentId": "5a6f77fa-bba5-4335-8b0c-e112ffff130c",
         "PageType": 4,
         "RootFolder": "/sites/sparvagen/Lists/Fastigheter",
-        "ID": 1,
+        "ID": 104,
         "properties": {
           "sampleText": "Value"
         }

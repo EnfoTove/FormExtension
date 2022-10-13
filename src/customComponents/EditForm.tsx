@@ -11,6 +11,8 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { Guid } from '@microsoft/sp-core-library';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import styles from './EditForm.module.scss';
+
  
 export interface IEditFormProps {
     sp: SPFI;
@@ -50,7 +52,7 @@ const EditForm: FC<IEditFormProps> = (props) => {
     }, []);
  
     return (
-        <React.Fragment>
+        <div className={styles.editForm}>
             <div>Edit Form</div>
             <div style={{ margin: '10px' }}>
                 <TextField label="Ange Fastighetsnamn" value={title} onChange={(e, v) => setTitle(v)} />
@@ -59,7 +61,7 @@ const EditForm: FC<IEditFormProps> = (props) => {
             {msg && msg.Message &&
                 <MessageBar messageBarType={msg.scope ? msg.scope : MessageBarType.info}>{msg.Message}</MessageBar>
             }
-        </React.Fragment>
+        </div>
     );
 };
  
