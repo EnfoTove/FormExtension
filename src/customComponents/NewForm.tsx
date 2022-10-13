@@ -16,6 +16,8 @@ import { Web } from '@pnp/sp/webs';
 import { FormCustomizerContext } from '@microsoft/sp-listview-extensibility';
 import { Dropdown, Icon, IDropdownOption, IDropdownStyles, IStackTokens, Stack } from 'office-ui-fabric-react';
 import { IItem } from "@pnp/sp/items/types";
+import "@pnp/sp/attachments";
+
 export interface INewFormProps {
     context:FormCustomizerContext;
     sp: SPFI;
@@ -29,9 +31,11 @@ const NewForm: FC<INewFormProps> = (props) => {
     const [floorArray, setfloorArray] =  useState<IRelatedItem[]>([]);
     const [errorDescription, setErrorDescription] = useState<any>(undefined);
     const [selectedFile, setSelectedFile] = useState();
-    const [selectedFileName, setSelectedFileName] = useState();
+    const [selectedFileName, setSelectedFileName] = useState("");
     const [msg, setMsg] = useState<any>(undefined);
     const options: IDropdownOption[]=[]
+    //const [testItem, setTestItem] = useState<IRelatedItem>();
+
     let counter = 0;
     const AttachmentIcon = () => <Icon iconName="Attach" className={styles.attachmentIcon}/>;
 
@@ -53,110 +57,95 @@ const NewForm: FC<INewFormProps> = (props) => {
         .catch(console.error);
       }, [buildingTitle]);
  
-    const clearControls = () => {
-        setBuildingTitle('');
-        setErrorDescription('');
+    const clearStates = () => {
+        setBuildingTitle("");
+        setErrorDescription("");
+        setSelectedFileName("");
     };
 
 
     const dropdownStyles: Partial<IDropdownStyles> = {
         dropdown: { width: 300 },
-      };
- 
-    const addListItem = async () => {
+    };
+
+    async function getRelatedItems():Promise<IRelatedItem[]>{
+        const queryString = `Byggnad eq  '${ buildingTitle }'`;
+     try {
+         const relatedItems = await props.sp.web.lists.getByTitle("Våningar")
+         .items
+         .select("Title, Byggnad")
+         .filter(queryString)
+         ();
+         return relatedItems as unknown as Promise<IRelatedItem[]>;
+       } catch (error) {
+         console.error(error);
+       }
+   }    
+       const stackTokens: IStackTokens = { childrenGap: 20 };
+   
+       async function populateFloorArray(items:any) {
+           try {
+               await getRelatedItems().then(items=>{
+                   setfloorArray(items)
+               })
+           } catch (error) {
+               console.error(error);
+           }
+       }
+   
+       
+       
+       const createOptions=()=>{
+           floorArray.forEach(floor => {
+               const object= { key: floor.Title, text: floor.Title};        
+                   options.push(object);              
+               });               
+       }
+       
+       const setCounter=()=>{
+           // eslint-disable-next-line no-unused-expressions
+           counter>0? null : createOptions()
+           counter= counter +1;
+       }
+   
+       const handleInputAndResetCounter=(value:string)=>{
+           setBuildingTitle(value);
+           counter=0;
+       }
+   
+       const onFileChange = (event:any) => {
+           setSelectedFileName(event.target.files[0].name)
+           const file = event.target.files[0];
+           const reader = new FileReader();
+           // eslint-disable-next-line @typescript-eslint/no-empty-function
+           reader.onloadend = function(){};
+           reader.readAsDataURL(file);
+           setSelectedFile(file);
+       };
+      
+   
+    async function addListItem(){
         let itemId:number;
         setMsg(undefined);
-        await props.sp.web.lists.getById(props.listGuid.toString()).items.add({
+       await props.sp.web.lists.getById(props.listGuid.toString()).items.add({
             Title: buildingTitle,
             Felbeskrivning:errorDescription
         }).then((result)=>{
-            itemId=result.data.ID;
-            console.log(itemId)
-        });
-
-        console.log(props.listGuid.toString())
-        const item: IItem  = props.sp.web.lists.getById(props.listGuid.toString()).items.getById(itemId);
-        console.log(item)
+            itemId=result.data.ID
+        })
+        console.log("söker efter ID: " + itemId)
+        const item:IItem= props.sp.web.lists.getById(props.listGuid.toString()).items.getById(itemId);
         console.log(selectedFileName)
-        await item.attachmentFiles.add(selectedFileName, "This is a message!!")
-        
-        setMsg({ scope: MessageBarType.success, Message: 'New item created successfully!' });
-        clearControls();
-    };
-
-    // export async function PostMessage (itemObj:IInputItem, postList:string){
-    //     let itemId:number;
-    //     if(itemObj !== null){
-    //     const messageItem=await sp.web.lists.getByTitle(postList).items.add({
-    //       Title: itemObj.Rubrik,
-    //       Meddelande: itemObj.Meddelande,
-    //     }).then((result)=>{
-    //       itemId=result.data.ID
-    //     })
-    //     const item: IItem  = sp.web.lists.getByTitle(postList).items.getById(itemId);
-    //     await item.attachmentFiles.add(itemObj.BildNamn, itemObj.BildBlob)
-    //   }
-      
-    //   }
-
- async function getRelatedItems():Promise<IRelatedItem[]>{
-     const queryString = `Byggnad eq  '${ buildingTitle }'`;
-  try {
-      const relatedItems = await props.sp.web.lists.getByTitle("Våningar")
-      .items
-      .select("Title, Byggnad")
-      .filter(queryString)
-      ();
-      return relatedItems as unknown as Promise<IRelatedItem[]>;
-    } catch (error) {
-      console.error(error);
-    }
-}    
-    const stackTokens: IStackTokens = { childrenGap: 20 };
-
-    async function populateFloorArray(items:any) {
-        try {
-            await getRelatedItems().then(items=>{
-                setfloorArray(items)
-            })
-        } catch (error) {
-            console.error(error);
+        console.log(selectedFile)
+        console.log(typeof(item))
+        if(selectedFile){
+            await item.attachmentFiles.add(selectedFileName, selectedFile);
         }
-    }
 
-    
-    
-    const createOptions=()=>{
-        console.log("Options loading")
-        floorArray.forEach(floor => {
-            const object= { key: floor.Title, text: floor.Title};        
-                options.push(object);              
-            });               
-      //  setOptionsLoaded(true)
+        setMsg({ scope: MessageBarType.success, Message: 'New item created successfully!' });
+        clearStates();
     }
-    
-    const setCounter=()=>{
-        // eslint-disable-next-line no-unused-expressions
-        counter>0? null : createOptions()
-        counter= counter +1;
-    }
-
-    const handleInputAndResetCounter=(value:string)=>{
-        setBuildingTitle(value);
-        counter=0;
-    }
-
-    const onFileChange = (event:any) => {
-        setSelectedFileName(event.target.files[0].name)
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        reader.onloadend = function(){};
-        reader.readAsDataURL(file);
-        setSelectedFile(file);
-    };
-   
-
+ 
     return (
         <div className={styles.newForm}>
             <div className={styles.newFormInput}>

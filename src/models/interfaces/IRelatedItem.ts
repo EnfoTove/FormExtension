@@ -1,5 +1,6 @@
 export interface IRelatedItem{
     ID:number;
     Title:string;
-    Byggnad:string;
+    Felbeskrivning:string;
+    AttachmentFiles?:any;
 }
